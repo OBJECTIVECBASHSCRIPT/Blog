@@ -811,7 +811,58 @@ Takeaway:
                   <div style="margin-left: 20px;">
                     <details>
                       <summary><strong>SOL_TRANSACTION_JSCRIPT.js</strong></summary>
-                      <pre><code>...JS script code...</code></pre>
+                      <pre><code>
+const solanaWeb3 = require('@solana/web3.js');
+const fs = require('fs');
+
+
+const secretKey = new Uint8Array([
+    ##,###,###,###,###,###, ###, ###
+]);
+
+const wallet = solanaWeb3.Keypair.fromSecretKey(secretKey);
+
+console.log(' Public Key:', wallet.publicKey.toString());
+
+const connection = new solanaWeb3.Connection(
+    solanaWeb3.clusterApiUrl('devnet'),
+    'confirmed'
+);
+
+async function getBalance() {
+    const balance = await connection.getBalance(wallet.publicKey);
+    console.log(' Wallet Balance:', balance / solanaWeb3.LAMPORTS_PER_SOL, 'SOL');
+}
+
+
+async function airdrop() {
+    const latestBlockhash = await connection.getLatestBlockhash();
+
+    const airdropSignature = await connection.requestAirdrop(
+        wallet.publicKey,
+        solanaWeb3.LAMPORTS_PER_SOL * 2
+    );
+
+    await connection.confirmTransaction(
+        {
+            signature: airdropSignature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+        },
+        'confirmed'
+    );
+
+    console.log(' Airdrop successful! Signature:', airdropSignature);
+}
+
+
+async function main() {
+    await airdrop();
+    await getBalance();
+}
+
+main();
+</code></code></pre>
                     </details>
                   </div>
                 </details>
@@ -821,7 +872,27 @@ Takeaway:
                   <div style="margin-left: 20px;">
                     <details>
                       <summary><strong>MONERO.rs</strong></summary>
-                      <pre><code>...Rust script code...</code></pre>
+                      <pre><code>
+use monero::{PrivateKey, PublicKey, Address};
+use rand::rngs::OsRng;
+
+fn main() {
+   // Monero Logic:
+   let spend_key = PrivateKey::generate(&mut OsRng);
+   let view_key = PrivateKey::generate(&mut OsRng);
+
+   let spend_pub = PublicKey::from_private_key(&spend_key);
+   let view_pub = PublicKey::from_private_key(&view_key);
+
+   let address = Address::standard(Network::Mainnet, &spend_pub, &view_pub);
+
+     println!("Spend Key: {:?}", spend_key);
+     println!("View Key {:?}", view_key);
+     println("Address: {}", address);
+     println!("ready to shuffle!");
+}
+  
+</code></pre>
                     </details>
                   </div>
                 </details>
